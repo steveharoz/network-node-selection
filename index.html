@@ -37,13 +37,13 @@ d3.json("miserables.json", function(error, graph) {
       .links(graph.links)
       .start();
 
-  var link = svg.selectAll("line.link")
+  var link = svg.selectAll(".link")
       .data(graph.links)
     .enter().append("line")
       .attr("class", "link")
       .style("stroke-width", function(d) { return Math.sqrt(d.value); });
 
-  var node = svg.selectAll("circle.node")
+  var node = svg.selectAll(".node")
       .data(graph.nodes)
     .enter().append("circle")
       .attr("class", "node")
