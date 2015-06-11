@@ -14,7 +14,7 @@
 
 </style>
 <body>
-<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
 <script>
 
 var width = 960,
@@ -32,6 +32,8 @@ var svg = d3.select("body").append("svg")
     .attr("height", height);
 
 d3.json("miserables.json", function(error, graph) {
+  if (error) throw error;
+
   force
       .nodes(graph.nodes)
       .links(graph.links)
