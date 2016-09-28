@@ -104,9 +104,9 @@ function updateDraw() {
 
   // position
   link4Tick
-      //.transition(transition)
-      .attr("x1", d => d.source.selectedX) //toSVGCoords(toWorldCoords(d.source), d.source.selected).x)
-      .attr("y1", d => d.source.selectedY) //toSVGCoords(toWorldCoords(d.source), d.source.selected).y)
+      .transition(transition)
+      .attr("x1", d => d.source.selectedX)
+      .attr("y1", d => d.source.selectedY)
       .attr("x2", d => d.target.selectedX) 
       .attr("y2", d => d.target.selectedY);
 
