@@ -86,6 +86,8 @@ function updateDraw() {
 
   for (var n=0; n<graph.nodes.length; n++) {
       graph.nodes[n].selected = selectionProximity(graph.nodes[n].id);
+      graph.nodes[n].selectedX = toSVGCoords(toWorldCoords(graph.nodes[n]), graph.nodes[n].selected).x;
+      graph.nodes[n].selectedY = toSVGCoords(toWorldCoords(graph.nodes[n]), graph.nodes[n].selected).y;
   } 
 
   link4Tick
@@ -103,15 +105,15 @@ function updateDraw() {
   // position
   link4Tick
       //.transition(transition)
-      .attr("x1", d => toSVGCoords(toWorldCoords(d.source), d.source.selected).x)
-      .attr("y1", d => toSVGCoords(toWorldCoords(d.source), d.source.selected).y)
-      .attr("x2", d => toSVGCoords(toWorldCoords(d.target), d.target.selected).x)
-      .attr("y2", d => toSVGCoords(toWorldCoords(d.target), d.target.selected).y);
+      .attr("x1", d => d.source.selectedX) //toSVGCoords(toWorldCoords(d.source), d.source.selected).x)
+      .attr("y1", d => d.source.selectedY) //toSVGCoords(toWorldCoords(d.source), d.source.selected).y)
+      .attr("x2", d => d.target.selectedX) 
+      .attr("y2", d => d.target.selectedY);
 
   node4Tick
       .transition(transition)
-      .attr("cx", d => toSVGCoords(toWorldCoords(d), d.selected).x)
-      .attr("cy", d => toSVGCoords(toWorldCoords(d), d.selected).y);
+      .attr("cx", d => d.selectedX)
+      .attr("cy", d => d.selectedY);
 }
 
 function selectionProximity(id) {
