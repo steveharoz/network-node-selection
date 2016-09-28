@@ -96,7 +96,7 @@ function updateDraw() {
   node4Tick
       .data(nodeIndices.map(i => graph.nodes[i]))
       .transition(transition)
-      .attr("stroke-width", (d => 0*d.selected))
+      //.attr("stroke-width", (d => 0*d.selected))
       .attr("r", d => d.selected*2 + 5)
       .attr("fill", d => d3.hcl(color(d.group)).brighter(d.selected*1) );
 
