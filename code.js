@@ -9,7 +9,7 @@ var simulation = d3.forceSimulation()
     .force("charge", d3.forceManyBody())
     .force("center", d3.forceCenter(width / 2, height / 2));
 
-var selected = ["CountessdeLo"];
+var selected = [];
 var graph;
 var selectedNodes;
 var links, nodes, texts;
@@ -67,6 +67,7 @@ function firstDraw() {
   }
 
   links = links.enter().append("line");
+    //.attr("filter", "url(#linkShadow)");
   texts = text.enter().append("text")
     .attr("filter", "url(#shadow)");
 
@@ -111,7 +112,7 @@ function updateDraw() {
       .data(graph.links)
       .transition(transition)
       .style("stroke", d => color( graph.nodes.find(n => n.id == d.target.id).group ))
-      .attr("stroke-width", d => Math.pow(Math.max( d.source.selected, d.target.selected),2) + 1);
+      .attr("stroke-width", d => Math.pow(Math.max( d.source.selected, d.target.selected),2)/2 + 1);
   nodes
       .data(nodeIndices.map(i => graph.nodes[i]))
       .transition(transition)

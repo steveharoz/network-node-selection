@@ -34,10 +34,19 @@ text {
 </style>
 <svg width="960" height="600">
   <defs>
-    <filter id="shadow" height="150%">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/> <!-- stdDeviation is how much to blur -->
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feMorphology in="SourceAlpha" result="dilated" operator="dilate" radius="1.25"></feMorphology>
+      <feGaussianBlur in="dilated" result="blurred" stdDeviation="3"/> <!-- stdDeviation is how much to blur -->
       <feMerge> 
-        <feMergeNode/> <!-- this contains the offset blurred image -->
+        <feMergeNode in="blurred"/> <!-- this contains the offset blurred image -->
+        <feMergeNode in="SourceGraphic"/> <!-- this contains the element that the filter is applied to -->
+      </feMerge>
+    </filter>
+    <filter id="linkShadow" x="-100%" y="-100%" width="300%" height="300%">
+      <feMorphology in="SourceAlpha" result="dilated" operator="dilate" radius="1"></feMorphology>
+      <feGaussianBlur in="dilated" result="blurred" stdDeviation="2"/> <!-- stdDeviation is how much to blur -->
+      <feMerge> 
+        <feMergeNode in="blurred"/> <!-- this contains the offset blurred image -->
         <feMergeNode in="SourceGraphic"/> <!-- this contains the element that the filter is applied to -->
       </feMerge>
     </filter>
