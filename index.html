@@ -2,6 +2,8 @@
 <meta charset="utf-8">
 <style>
 
+body { font-family: sans-serif; }
+
 svg { background-color: #333; }
 
 line {
@@ -18,7 +20,28 @@ circle:hover {
   stroke-width: 1;
 }
 
+text {
+  fill: #eee;
+  /*stroke: #000;
+  stroke-width: 1;*/
+}
+text {
+  /*-webkit-filter: drop-shadow( -5px -5px 5px #000 );
+          filter: drop-shadow( -5px -5px 5px #000 ); /* Same syntax as box-shadow */
+}
+
+
 </style>
-<svg width="960" height="600"></svg>
+<svg width="960" height="600">
+  <defs>
+    <filter id="shadow" height="150%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/> <!-- stdDeviation is how much to blur -->
+      <feMerge> 
+        <feMergeNode/> <!-- this contains the offset blurred image -->
+        <feMergeNode in="SourceGraphic"/> <!-- this contains the element that the filter is applied to -->
+      </feMerge>
+    </filter>
+  </defs>
+</svg>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="code.js"></script>

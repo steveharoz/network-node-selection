@@ -20,7 +20,8 @@ d3.json("miserables.txt", function(error, _graph) {
 var graph;
 var link;
 var node;
-var link4Tick, node4Tick;
+var link4Tick, node4Tick, text4Tick;
+var text;
 var nodeIndices = [];
 var is2D = true;
 //var selectedIndices = [];
@@ -37,6 +38,11 @@ function firstDraw() {
     .selectAll("circle")
     .data(graph.nodes);
  nodeIndices = d3.range(graph.nodes.length);
+
+  text = svg.append("g")
+      .attr("class", "text")
+    .selectAll("text")
+    .data(graph.nodes);
 
   node.append("title")
       .text(function(d) { return d.id; });
@@ -64,17 +70,31 @@ function firstDraw() {
   }
 
   link4Tick = link.enter().append("line");
+  text4Tick = text.enter().append("text")
+    .attr("filter", "url(#shadow)");
 
   node4Tick = node.enter().append("circle")
       .attr("title", d => d.id)
       .on("click", function(d,i){
           console.log(d);
           var index = selected.indexOf(d.id);
-          if (index >= 0)
+          if (index >= 0) {
             selected.splice(index, 1);
-          else if(d != null)
+            d.isSelected = false;
+            d.hover = false;
+          }
+          else if(d != null) {
             selected.push(d.id);
-          d.selected = true;
+            d.isSelected = true;
+          }
+          updateDraw();
+      })
+      .on("mouseenter", function(d,i){
+          d.hover = true;
+          updateDraw();
+      })
+      .on("mouseleave", function(d,i){
+          d.hover = false;
           updateDraw();
       });
   updateDraw();
@@ -100,7 +120,15 @@ function updateDraw() {
       .transition(transition)
       //.attr("stroke-width", (d => 0*d.selected))
       .attr("r", d => d.selected*2 + 5)
-      .attr("fill", d => d3.hcl(color(d.group)).brighter(d.selected*1) );
+      .attr("fill", d => d3.hcl(color(d.group)).brighter(3*(d.selected==2)) );
+  text4Tick
+      .data(nodeIndices.map(i => graph.nodes[i]))
+      .transition(transition)
+      .text(d => d.id)
+      .attr("text-anchor", "middle")
+      .attr("visibility", d => d.isSelected || d.hover ? "visible" : "hidden")
+      .attr("x", d => d.selectedX)
+      .attr("y", d => d.selectedY - 13);
 
   // position
   link4Tick
