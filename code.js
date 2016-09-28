@@ -10,6 +10,14 @@ var simulation = d3.forceSimulation()
     .force("center", d3.forceCenter(width / 2, height / 2));
 
 var selected = ["CountessdeLo"];
+var graph;
+var selectedNodes;
+var links, nodes, texts;
+var text;
+var nodeIndices = [];
+var is2D = true;
+//var selectedIndices = [];
+
 
 d3.json("miserables.txt", function(error, _graph) {
   if (error) throw error;
@@ -17,35 +25,23 @@ d3.json("miserables.txt", function(error, _graph) {
   firstDraw();
 });
 
-var graph;
-var link;
-var node;
-var link4Tick, node4Tick, text4Tick;
-var text;
-var nodeIndices = [];
-var is2D = true;
-//var selectedIndices = [];
-
 
 function firstDraw() {
-  link = svg.append("g")
-      .attr("class", "links")
-    .selectAll("line")
-    .data(graph.links);
+    links = svg.append("g")
+        .attr("class", "links")
+        .selectAll("line")
+        .data(graph.links);
 
-  node = svg.append("g")
-      .attr("class", "nodes")
-    .selectAll("circle")
-    .data(graph.nodes);
- nodeIndices = d3.range(graph.nodes.length);
+    nodes = svg.append("g")
+        .attr("class", "nodes")
+        .selectAll("circle")
+        .data(graph.nodes);
+    nodeIndices = d3.range(graph.nodes.length);
 
-  text = svg.append("g")
-      .attr("class", "text")
-    .selectAll("text")
-    .data(graph.nodes);
-
-  node.append("title")
-      .text(function(d) { return d.id; });
+    text = svg.append("g")
+        .attr("class", "text")
+        .selectAll("text")
+        .data(graph.nodes);
 
   simulation
       .nodes(graph.nodes)
@@ -57,23 +53,24 @@ function firstDraw() {
       simulation.tick();
   }
 
+  // stuff to do during force simulation
   function ticked() {
-    link4Tick
-        .attr("x1", d => selected.includes(d.id) ? d.source.x-10 : d.source.x)
-        .attr("y1", function(d) { return d.source.y; })
-        .attr("x2", function(d) { return d.target.x; })
-        .attr("y2", function(d) { return d.target.y; });
+    // links
+    //     .attr("x1",  d => selected.includes(d.id) ? d.source.x-10 : d.source.x)
+    //     .attr("y1", function(d) { return d.source.y; })
+    //     .attr("x2", function(d) { return d.target.x; })
+    //     .attr("y2", function(d) { return d.target.y; });
 
-    node4Tick
-        .attr("cx", function(d) { return d.x; })
-        .attr("cy", function(d) { return d.y; });
+    // nodes
+    //     .attr("cx", function(d) { return d.x; })
+    //     .attr("cy", function(d) { return d.y; });
   }
 
-  link4Tick = link.enter().append("line");
-  text4Tick = text.enter().append("text")
+  links = links.enter().append("line");
+  texts = text.enter().append("text")
     .attr("filter", "url(#shadow)");
 
-  node4Tick = node.enter().append("circle")
+  nodes = nodes.enter().append("circle")
       .attr("title", d => d.id)
       .on("click", function(d,i){
           console.log(d);
@@ -110,18 +107,18 @@ function updateDraw() {
       graph.nodes[n].selectedY = toSVGCoords(toWorldCoords(graph.nodes[n]), graph.nodes[n].selected).y;
   } 
 
-  link4Tick
+  links
       .data(graph.links)
       .transition(transition)
       .style("stroke", d => color( graph.nodes.find(n => n.id == d.target.id).group ))
       .attr("stroke-width", d => Math.pow(Math.max( d.source.selected, d.target.selected),2) + 1);
-  node4Tick
+  nodes
       .data(nodeIndices.map(i => graph.nodes[i]))
       .transition(transition)
       //.attr("stroke-width", (d => 0*d.selected))
       .attr("r", d => d.selected*2 + 5)
       .attr("fill", d => d3.hcl(color(d.group)).brighter(3*(d.selected==2)) );
-  text4Tick
+  texts
       .data(nodeIndices.map(i => graph.nodes[i]))
       .transition(transition)
       .text(d => d.id)
@@ -131,14 +128,14 @@ function updateDraw() {
       .attr("y", d => d.selectedY - 13);
 
   // position
-  link4Tick
+  links
       .transition(transition)
       .attr("x1", d => d.source.selectedX)
       .attr("y1", d => d.source.selectedY)
       .attr("x2", d => d.target.selectedX) 
       .attr("y2", d => d.target.selectedY);
 
-  node4Tick
+  nodes
       .transition(transition)
       .attr("cx", d => d.selectedX)
       .attr("cy", d => d.selectedY);
