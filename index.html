@@ -8,7 +8,7 @@ svg { background-color: #333; }
 
 line {
   stroke: #999;
-  stroke-opacity: 0.6;
+  /*stroke-opacity: 0.6;*/
 }
 
 circle {
@@ -25,10 +25,6 @@ text {
   /*stroke: #000;
   stroke-width: 1;*/
 }
-text {
-  /*-webkit-filter: drop-shadow( -5px -5px 5px #000 );
-          filter: drop-shadow( -5px -5px 5px #000 ); /* Same syntax as box-shadow */
-}
 
 
 </style>
@@ -44,7 +40,7 @@ text {
     </filter>
     <filter id="linkShadow" x="-100%" y="-100%" width="300%" height="300%">
       <feMorphology in="SourceAlpha" result="dilated" operator="dilate" radius="1"></feMorphology>
-      <feGaussianBlur in="dilated" result="blurred" stdDeviation="2"/> <!-- stdDeviation is how much to blur -->
+      <feGaussianBlur in="dilated" result="blurred" stdDeviation="1"/>
       <feMerge> 
         <feMergeNode in="blurred"/> <!-- this contains the offset blurred image -->
         <feMergeNode in="SourceGraphic"/> <!-- this contains the element that the filter is applied to -->

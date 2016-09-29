@@ -49,9 +49,19 @@ function firstDraw() {
   simulation.force("link")
       .links(graph.links);
 
+  // perform node layout
   for (var i=0; i<1000; i++) {
       simulation.tick();
   }
+
+  // compute link length
+  for (var i=0; i<graph.links.length; i++) {
+      var x = graph.links[i].source.x - graph.links[i].target.x;
+      var y = graph.links[i].source.y - graph.links[i].target.y;
+      graph.links[i].distance = Math.sqrt(x * x + y * y);
+  } 
+  graph.links = graph.links.sort( (a,b) => b.distance-a.distance );
+
 
   // stuff to do during force simulation
   function ticked() {
@@ -66,8 +76,8 @@ function firstDraw() {
     //     .attr("cy", function(d) { return d.y; });
   }
 
-  links = links.enter().append("line");
-    //.attr("filter", "url(#linkShadow)");
+  links = links.enter().append("line")
+    .attr("filter", "url(#linkShadow)");
   texts = text.enter().append("text")
     .attr("filter", "url(#shadow)");
 
@@ -100,7 +110,7 @@ function firstDraw() {
 
 function updateDraw() {
   var transition = d3.transition()
-    .duration(0);
+    .duration(250);
 
   for (var n=0; n<graph.nodes.length; n++) {
       graph.nodes[n].selected = selectionProximity(graph.nodes[n].id);
@@ -112,7 +122,7 @@ function updateDraw() {
       .data(graph.links)
       .transition(transition)
       .style("stroke", d => color( graph.nodes.find(n => n.id == d.target.id).group ))
-      .attr("stroke-width", d => Math.pow(Math.max( d.source.selected, d.target.selected),2)/2 + 1);
+      .attr("stroke-width", d => Math.pow(Math.max( d.source.selected, d.target.selected),2)/1.5 + 1);
   nodes
       .data(nodeIndices.map(i => graph.nodes[i]))
       .transition(transition)
@@ -166,7 +176,7 @@ function selectionProximity(id) {
 }
 
 function toWorldCoords(thing, shift=.25) {
-  shift = 1 + thing.selected * shift * is2D;
+  shift = 1 + thing.selected * shift * !is2D;
   return {
     x: (thing.x / width * 2 - 1) * shift,
     y: (thing.y / height * 2 - 1) * shift
