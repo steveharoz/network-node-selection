@@ -11,7 +11,7 @@ var simulation = d3.forceSimulation()
 
 var selected = [];
 var graph;
-var selectedNodes;
+var frontNodes, frontLinks;
 var links, nodes, texts;
 var text;
 var nodeIndices = [];
@@ -37,6 +37,16 @@ function firstDraw() {
         .selectAll("circle")
         .data(graph.nodes);
     nodeIndices = d3.range(graph.nodes.length);
+
+    frontLinks = svg.append("g")
+        .attr("class", "links front")
+        .selectAll("line")
+        .data(graph.links);
+
+    frontNodes = svg.append("g")
+        .attr("class", "nodes front")
+        .selectAll("circle")
+        .data(graph.nodes);
 
     text = svg.append("g")
         .attr("class", "text")
@@ -78,6 +88,8 @@ function firstDraw() {
 
   links = links.enter().append("line")
     .attr("filter", "url(#linkShadow)");
+  frontLinks = frontLinks.enter().append("line")
+    .attr("filter", "url(#linkShadow)");
   texts = text.enter().append("text")
     .attr("filter", "url(#shadow)");
 
@@ -105,6 +117,31 @@ function firstDraw() {
           d.hover = false;
           updateDraw();
       });
+
+  frontNodes = frontNodes.enter().append("circle")
+      .attr("title", d => d.id)
+      .on("click", function(d,i){
+          console.log("front"); console.log(d);
+          var index = selected.indexOf(d.id);
+          if (index >= 0) {
+            selected.splice(index, 1);
+            d.isSelected = false;
+            d.hover = false;
+          }
+          else if(d != null) {
+            selected.push(d.id);
+            d.isSelected = true;
+          }
+          updateDraw();
+      })
+      .on("mouseenter", function(d,i){
+          d.hover = true;
+          updateDraw();
+      })
+      .on("mouseleave", function(d,i){
+          d.hover = false;
+          updateDraw();
+      });
   updateDraw();
 }
 
@@ -112,6 +149,7 @@ function updateDraw() {
   var transition = d3.transition()
     .duration(250);
 
+  // update selected procimity and shift for 2D
   for (var n=0; n<graph.nodes.length; n++) {
       graph.nodes[n].selected = selectionProximity(graph.nodes[n].id);
       graph.nodes[n].selectedX = toSVGCoords(toWorldCoords(graph.nodes[n]), graph.nodes[n].selected).x;
@@ -122,11 +160,23 @@ function updateDraw() {
       .data(graph.links)
       .transition(transition)
       .style("stroke", d => color( graph.nodes.find(n => n.id == d.target.id).group ))
+      .attr("stroke-width", 1);//d => Math.pow(Math.max( d.source.selected, d.target.selected),2)/1.5 + 1);
+  frontLinks
+      .data(graph.links)
+      .transition(transition)
+      .attr("visibility", d => Math.max(d.source.selected, d.target.selected) > 1 ? "visible" : "collapse")
+      .style("stroke", d => color( graph.nodes.find(n => n.id == d.target.id).group ))
       .attr("stroke-width", d => Math.pow(Math.max( d.source.selected, d.target.selected),2)/1.5 + 1);
   nodes
       .data(nodeIndices.map(i => graph.nodes[i]))
       .transition(transition)
       //.attr("stroke-width", (d => 0*d.selected))
+      .attr("r", d => d.selected*2 + 5)
+      .attr("fill", d => d3.hcl(color(d.group)).brighter(3*(d.selected==2)) );
+  frontNodes
+      .data(nodeIndices.map(i => graph.nodes[i]))
+      .transition(transition)
+      .attr("visibility", d => d.selected ? "visible" : "collapse")
       .attr("r", d => d.selected*2 + 5)
       .attr("fill", d => d3.hcl(color(d.group)).brighter(3*(d.selected==2)) );
   texts
@@ -145,11 +195,23 @@ function updateDraw() {
       .attr("y1", d => d.source.selectedY)
       .attr("x2", d => d.target.selectedX) 
       .attr("y2", d => d.target.selectedY);
+  frontLinks
+      .transition(transition)
+      .attr("x1", d => d.source.selectedX)
+      .attr("y1", d => d.source.selectedY)
+      .attr("x2", d => d.target.selectedX) 
+      .attr("y2", d => d.target.selectedY);
 
   nodes
       .transition(transition)
       .attr("cx", d => d.selectedX)
       .attr("cy", d => d.selectedY);
+  frontNodes
+      .transition(transition)
+      .attr("cx", d => d.selectedX)
+      .attr("cy", d => d.selectedY);
+
+  
 }
 
 function selectionProximity(id) {
